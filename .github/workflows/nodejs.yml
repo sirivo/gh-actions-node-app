@@ -13,9 +13,14 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x, 18.x]
+        node-version: [12.x, 14.x, 16.x]
         operating-system: [ubuntu-latest, windows-latest]
-
+        include:
+          - node-version: 18
+            operating-system: ubuntu-latest
+        exclude:
+          - node-version: 12
+            operating-system: windows-latest
     steps:     
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
