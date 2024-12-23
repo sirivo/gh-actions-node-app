@@ -1,4 +1,4 @@
-name: Node App CI
+name: Node.js CI
 
 on:
   push:
@@ -7,27 +7,44 @@ on:
     branches: [ main ]
 
 jobs:
-  
   build:
     runs-on: ${{ matrix.operating-system }}
-    continue-on-error: true
+
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x]
         operating-system: [ubuntu-latest, windows-latest]
         include:
-          - node-version: 18
+          - node-version: 12
             operating-system: ubuntu-latest
         exclude:
-          - node-version: 12
+          - node-version: 18
             operating-system: windows-latest
-    steps:     
+    
+    steps:
     - uses: actions/checkout@v4
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build
+      run: npm run build --if-present
+    
+    - name: Run tests
+      run: npm test
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security scan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: '.'
